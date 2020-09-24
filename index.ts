@@ -1,4 +1,3 @@
-import path from "path";
 import app from "@server/server";
 
 const PORT = 8080;
