@@ -1,6 +1,6 @@
-import path from "path";
 import express from "express";
-import router from "@server/routes";
+import {mongoCreate} from "@database/mongo"
+
 
 const app = express();
 
@@ -10,17 +10,28 @@ export const serverInit = () => {
     app.listen(PORT, () => {
         console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
     });
+    mongoCreate();
+}
 
-    app.get('/test', (req, res, next) => {
+export const checkQuery = () => {
+    // next calls the next functions
+    app.get('/test', (req, res) => {
         res.send('test successful')
     });
-}
 
-// kind of useless for now
-export const stuff = () => {
-    app.set('view engine', 'ejs');
-    app.set('views', path.join(__dirname, '../client'));
-    app.use(express.static(path.join(__dirname, '../client')));
-    app.use('/', router);
-}
+    app.post("/categories/create", (req, res) => {
+        try {
+            console.log(req.body)
 
+            if (!req.body) {
+                res.status(400);
+                throw new Error('Body is empty');
+            }
+
+            res.sendStatus(200);
+            res.send('creation successful');
+        }catch (e) {
+            res.json({error: {message: e.message}});
+        }
+    })
+}

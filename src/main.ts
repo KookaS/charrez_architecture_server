@@ -1,8 +1,7 @@
 import path from "path";
-import {serverInit, stuff} from "@server/server";
+import {serverInit, checkQuery} from "@server/server";
 // let serverInit() = require("./server/server")
 import express from "express";
-// import {mongoCreate} from "@database/mongo"
 
 // const app = express();
 // const PORT = 8080;
@@ -12,6 +11,4 @@ import express from "express";
 // });
 
 serverInit();
-stuff();
-
-// mongoCreate();
+checkQuery();
