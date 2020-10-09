@@ -12,18 +12,16 @@ https://khalilstemmler.com/blogs/typescript/node-starter-project/
 
     npm init --yes
     
-    npm install
+    npm i
     
     tsc --init
-    
-    npm install --save-dev rimraf
     
 ## start
 
 nodemon script start
 
-    npm run start:dev
+    npm run dev
     
-build script start
-
-    npm run start
+## kill port
+    
+    sudo kill $(sudo lsof -t -i:8080)

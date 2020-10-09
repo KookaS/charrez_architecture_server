@@ -30,5 +30,9 @@ typings/
 # build files from ts to js
 build
 
+#package.json generated file at compilation
 package-lock.json
+
+#uploaded files from front-end
+uploads
 

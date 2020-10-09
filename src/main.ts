@@ -11,4 +11,3 @@ import express from "express";
 // });
 
 serverInit();
-checkQuery();
