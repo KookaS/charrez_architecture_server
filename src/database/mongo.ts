@@ -1,32 +1,28 @@
-import {Mongoose} from "mongoose";
+import mongodb from "mongodb";
 
 const dbName = "charrez_architecture";
-const url = "mongodb://localhost:27017/"+dbName;
-console.log(url)
+const url = "mongodb://localhost:27017/" + dbName;
 
-export const mongoCreate = () => {
-    let MongoClient = require('mongodb').MongoClient;
+export const mongoInit = async() => {
+    let MongoClient = mongodb.MongoClient;
 
-    MongoClient.connect(url, (err: Error, db: any) => {
-        if (err) throw err;
+    await MongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true}, (err: Error, db) => {
+        if (err) console.log(Error('DB cannot open'));
         console.log("Database created!");
-        db.collection
         db.close();
     });
 }
 
-export const mongoFind = () => {
-    let MongoClient = require('mongodb').MongoClient;
+export const mongoCreate = async () => {
+    let MongoClient = mongodb.MongoClient;
 
-    MongoClient.connect(url, (err: Error, db: any) => {
-        if (err) throw err;
-
-        // db.collection('mammals').find().toArray(function(err, result){
-        //      if(err) throw err;
-        //      console.log(result);
-        //      client.close();
-        //    });
-
+    await MongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true}, (err: Error, db: any) => {
+        if (err) {
+            console.log(Error('DB cannot open'));
+            return err
+        }
+        db.collection();
         db.close();
     });
 }
+
