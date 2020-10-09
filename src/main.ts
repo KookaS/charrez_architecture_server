@@ -1,5 +1,5 @@
 import path from "path";
-import {serverInit, checkQuery} from "@server/server";
+import {serverInit} from "@server/server";
 // let serverInit() = require("./server/server")
 import express from "express";
 
