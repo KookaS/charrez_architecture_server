@@ -2,9 +2,10 @@ import express from "express";
 import multer from "multer"
 import path from "path"
 import {Server} from "http";
-import {mongoInit} from "@database/mongo"
+import {mongoInsertProject} from "@database/mongo"
+import HttpStatus from "http-status-codes"
 
-//multex file storage with new name and prev extension
+//multer file storage with new name and prev extension
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/')
@@ -24,46 +25,7 @@ export const serverInit = () => {
     app.get('/', (req, res) => res.send('Express + TypeScript Server'));
     serverStart();
     createProject("maison");
-}
-
-/// send in body title, description and date for new
-const createProject = (projectType: string) => {
-    app.post("/"+ projectType +"/create", upload.single("image"), (req, res) => {
-        try {
-            //check image
-            if (!req.file) {
-                throw new Error('No image sent');
-            }
-            const imageName = req.file.filename;
-            console.log("image name: " + imageName);
-            //check title
-            if (!req.body.title) {
-                throw new Error('No title given');
-            }
-            const imageTitle = req.body.title;
-            console.log("image title: " + imageTitle);
-            //check description
-            if (!req.body.description) {
-                throw new Error('No description given');
-            }
-            const imageDescription = req.body.description;
-            console.log("image description: " + imageDescription);
-            // check date
-            if (!req.body.date) {
-                throw new Error('No date given');
-            }
-            const imageDate = req.body.date;
-            console.log("image description: " + imageDate);
-
-            const generatedID = makeID(10);
-            listID.push(generatedID);
-            const resMessage = {message: 'creation successful', id: generatedID}
-            res.status(200).send(resMessage);
-            resetConnection();
-        } catch (e) {
-            res.status(400).send(e.message);
-        }
-    })
+    addToProject("maison");
 }
 
 /// restart the server
@@ -94,4 +56,67 @@ const makeID = (length: number) => {
         }
     }
     return result;
+}
+
+/// send in body title, description and date for new
+const createProject = (projectType: string) => {
+    app.post("/"+ projectType +"/create", upload.single("image"), async (req, res) => {
+        try {
+            if (!req.file || !req.body.title || !req.body.description || !req.body.date) {
+                throw new Error;
+            }
+            const imageName = req.file.filename;
+            console.log("image name: " + imageName);
+            const imageTitle = req.body.title;
+            console.log("image title: " + imageTitle);
+            const imageDescription = req.body.description;
+            console.log("image description: " + imageDescription);
+            const imageDate = req.body.date;
+            console.log("image description: " + imageDate);
+
+            const generatedID = makeID(10);
+            listID.push(generatedID);
+
+
+            await mongoInsertProject(projectType, generatedID, imageTitle, imageDescription, imageDate);
+            console.log("right before sending HTTP response")
+
+            const resMessage = {message: 'creation successful', id: generatedID};
+            res.status(HttpStatus.OK).send(resMessage);
+            resetConnection();
+        } catch (e) {
+            const errorMessage = {error: 'Missing element in query '+ projectType + "_add. Empty fields: `` ``.",
+                title: req.body.title || "",
+                description: req.body.description || "",
+                date: req.body.date || "",
+                imageName: req.file.filename || ""}
+            console.log(errorMessage);
+            res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+    })
+}
+
+/// send in body title, description and date for new
+const addToProject = (projectType: string) => {
+    app.post("/"+ projectType +"/add", upload.single("image"), (req, res) => {
+        try {
+            if (!req.file || !req.body.description) {
+                throw new Error;
+            }
+            const imageDescription = req.body.description;
+            console.log("image description: " + imageDescription);
+
+            const generatedID = makeID(10);
+            listID.push(generatedID);
+            const resMessage = {message: 'creation successful', id: generatedID}
+            res.status(HttpStatus.OK).send(resMessage);
+            resetConnection();
+        } catch (e) {
+            const errorMessage = {error: 'Missing element in query '+ projectType + "_add. Empty fields: `` ``.",
+                description: req.body.description || "",
+                imageName: req.file.filename || ""}
+            console.log(errorMessage);
+            res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+    })
 }
