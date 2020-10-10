@@ -1,28 +1,36 @@
-import mongodb from "mongodb";
+import {MongoHelper} from "@database/helper"
 
-const dbName = "charrez_architecture";
-const url = "mongodb://localhost:27017/" + dbName;
-
-export const mongoInit = async() => {
-    let MongoClient = mongodb.MongoClient;
-
-    await MongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true}, (err: Error, db) => {
-        if (err) console.log(Error('DB cannot open'));
-        console.log("Database created!");
-        db.close();
-    });
+// create a new project in the db
+export const mongoInsertProject = async (projectType: string, id: string, title: string, description: string, date: string) => {
+    await mongoConnect();
+    const collection = MongoHelper.db().collection(projectType);
+    const document = {id, title, description, date};
+    try {
+        await collection.insertOne(document);
+        console.log(id + " has been inserted well!")
+    } catch (e) {
+        console.error("Unable to insert project: " + e)
+    }
+    mongoClose();
 }
 
-export const mongoCreate = async () => {
-    let MongoClient = mongodb.MongoClient;
-
-    await MongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true}, (err: Error, db: any) => {
-        if (err) {
-            console.log(Error('DB cannot open'));
-            return err
-        }
-        db.collection();
-        db.close();
-    });
+const mongoConnect = async () => {
+    try {
+        await MongoHelper.connect();
+        console.log(`Connected to Mongo!`);
+    } catch (err) {
+        console.error(`Unable to connect to Mongo!`, err);
+    }
 }
+
+const mongoClose = () => {
+    try {
+        MongoHelper.disconnect();
+        console.log(`Closed Mongo!`);
+    } catch (err) {
+        console.error(`Unable to connect to Mongo!`, err);
+    }
+}
+
+
 
