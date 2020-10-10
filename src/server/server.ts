@@ -1,12 +1,7 @@
 import express from "express";
 import {Server} from "http";
-import {mongoInsertProject} from "@database/mongo"
 import HttpStatus from "http-status-codes"
 import {uploadFile} from "@database/upload"
-import multer from "multer";
-import path from "path";
-import GridFsStorage from "multer-gridfs-storage"
-import {MongoHelper} from "@database/helper";
 
 const app = express();
 const PORT = 8080;
@@ -16,9 +11,9 @@ let listID: string[] = [];
 export const serverInit = () => {
     app.get('/', (req, res) => res.send('Express + TypeScript Server'));
     serverStart();
-    createProject("maison", "create", "maison");
-    createProject("immeuble", "create", "immeuble");
-    //addToProject("maison");
+    createProject("villas", "create", "villas");
+    createProject("immeubles", "create", "immeubles");
+    createProject("urbanisme", "create", "urbanisme");
 }
 
 /// restart the server
@@ -54,18 +49,15 @@ const makeID = (length: number) => {
 /// send in body title, description and date for new
 // example to upload values to db
 // await mongoInsertProject(projectType, req.file.id, imageTitle, imageDescription, imageDate);
-const createProject = (projectType: string, requestType: string, uploadFolder?: string) => {
-    app.post("/" + projectType + "/" + requestType, uploadFile(uploadFolder), async (req, res) => {
+const createProject = (projectType: string, requestType: string, dbName: string) => {
+    app.post("/" + projectType + "/" + requestType, uploadFile(dbName), async (req, res) => {
         try {
             req.file.metadata = {
                 title: req.body.title,
                 description: req.body.description,
                 date: req.body.date
             }
-            console.log()
-            console.log(req.file)
-
-            // await mongoInsertProject(projectType, generatedID, imageTitle, imageDescription, imageDate);
+            console.log(req.file.id)
 
             const resMessage = {message: 'creation successful', id: req.file.id, metadata: req.file.metadata};
             res.status(HttpStatus.OK).send(resMessage);
@@ -75,7 +67,8 @@ const createProject = (projectType: string, requestType: string, uploadFolder?: 
                 error: "File has not been uploaded!",
                 projectType,
                 requestType,
-                body: req.body}
+                body: req.body,
+                id: req.file.id}
             console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }

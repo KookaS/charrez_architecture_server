@@ -2,9 +2,9 @@ import multer from "multer";
 import {MongoHelper} from "@database/helper";
 import GridFsStorage from 'multer-gridfs-storage';
 
-export const uploadFile = ( uploadFolder?: string) => {
-    let url = MongoHelper.url;
-    uploadFolder ? url = url+"/"+uploadFolder: {};
+// collection name is file: db.fs.files
+export const uploadFile = ( dbName: string) => {
+    let url = MongoHelper.url+"/"+dbName;
     let storage = new GridFsStorage({
         url,
         options: {useNewUrlParser: true, useUnifiedTopology: true},

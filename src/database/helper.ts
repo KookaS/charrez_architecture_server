@@ -3,7 +3,6 @@ import {MongoClient} from 'mongodb';
 export class MongoHelper {
     public static client: MongoClient;
     public static url: string = "mongodb://localhost:27017";
-    public static dbName: string = "charrez_architecture";
 
     constructor() {
     }
@@ -33,8 +32,8 @@ export class MongoHelper {
         });
     };
 
-    public static db() {
-        return this.client.db(this.dbName)
+    public static db(dbName: string) {
+        return this.client.db(dbName)
     }
 }
 
