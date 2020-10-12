@@ -1,31 +1,24 @@
 import express from "express";
-import multer from "multer"
-import path from "path"
 import {Server} from "http";
-import {mongoInsertProject} from "@database/mongo"
 import HttpStatus from "http-status-codes"
+import {uploadFile, updateMetadata} from "@database/upload"
+import {mongoConnect, mongoClose, mongoFetchImage} from "@database/mongo";
 
-//multer file storage with new name and prev extension
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname)) //Appending extension
-    }
-});
-
-const upload = multer({storage: storage});
 const app = express();
 const PORT = 8080;
 let server: Server;
 let listID: string[] = [];
+const shell = require('shelljs');
 
 export const serverInit = () => {
-    app.get('/', (req, res) => res.send('Express + TypeScript Server'));
+    shell.exec('./reset-port.sh');
     serverStart();
-    createProject("maison");
-    addToProject("maison");
+    createProject("villas", "villas");
+    createProject("immeubles", "immeubles");
+    createProject("urbanisme", "urbanisme");
+    loadProject("villas", "villas");
+    //loadProject("immeubles", "immeubles");
+    //loadProject("urbanisme", "urbanisme");
 }
 
 /// restart the server
@@ -43,14 +36,14 @@ const serverStart = () => {
 
 /// random ID generator
 const makeID = (length: number) => {
-    let result           = '';
-    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
+    for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    for (const element of listID){
-        if (result == element){
+    for (const element of listID) {
+        if (result == element) {
             result = makeID(length);
             break;
         }
@@ -59,62 +52,60 @@ const makeID = (length: number) => {
 }
 
 /// send in body title, description and date for new
-const createProject = (projectType: string) => {
-    app.post("/"+ projectType +"/create", upload.single("image"), async (req, res) => {
+// example to upload values to db
+// await mongoInsertProject(projectType, req.file.id, imageTitle, imageDescription, imageDate);
+const createProject = (projectType: string, dbName: string) => {
+    app.post("/" + projectType + "/create", uploadFile(dbName), async (req, res) => {
         try {
-            if (!req.file || !req.body.title || !req.body.description || !req.body.date) {
-                throw new Error;
+            let warning = undefined;
+            if (!req.body.title || !req.body.description || !req.body.date) {
+                warning = "Missing element(s) in body of query";
             }
-            const imageName = req.file.filename;
-            console.log("image name: " + imageName);
-            const imageTitle = req.body.title;
-            console.log("image title: " + imageTitle);
-            const imageDescription = req.body.description;
-            console.log("image description: " + imageDescription);
-            const imageDate = req.body.date;
-            console.log("image description: " + imageDate);
-
-            const generatedID = makeID(10);
-            listID.push(generatedID);
-
-
-            await mongoInsertProject(projectType, generatedID, imageTitle, imageDescription, imageDate);
-            console.log("right before sending HTTP response")
-
-            const resMessage = {message: 'creation successful', id: generatedID};
+            const metadata = {
+                title: req.body.title,
+                description: req.body.description,
+                date: req.body.date
+            }
+            updateMetadata(metadata); //Static test value
+            console.log(req.file.id)
+            const resMessage = {message: 'creation successful', id: req.file.id, metadata: metadata, warning};
             res.status(HttpStatus.OK).send(resMessage);
-            resetConnection();
+            // resetConnection();
         } catch (e) {
-            const errorMessage = {error: 'Missing element in query '+ projectType + "_add. Empty fields: `` ``.",
-                title: req.body.title || "",
-                description: req.body.description || "",
-                date: req.body.date || "",
-                imageName: req.file.filename || ""}
+            const errorMessage = {
+                message: "File has not been uploaded!",
+                error: e.message,
+                projectType,
+                body: req.body,
+                id: req.file.id
+            }
             console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     })
 }
 
-/// send in body title, description and date for new
-const addToProject = (projectType: string) => {
-    app.post("/"+ projectType +"/add", upload.single("image"), (req, res) => {
+const loadProject = async (projectType: string, dbName: string) => {
+    app.get("/" + projectType + "/load", async (req, res) => {
         try {
-            if (!req.file || !req.body.description) {
-                throw new Error;
+            const id = req.query.id;
+            console.log()
+            if (!id) {
+                throw new Error('Missing id in in params of query');
             }
-            const imageDescription = req.body.description;
-            console.log("image description: " + imageDescription);
-
-            const generatedID = makeID(10);
-            listID.push(generatedID);
-            const resMessage = {message: 'creation successful', id: generatedID}
+            let files = await mongoFetchImage(dbName, id.toString());
+            console.log("after sending")
+            const resMessage = {message: 'Load successful', id, files};
             res.status(HttpStatus.OK).send(resMessage);
-            resetConnection();
+            console.log("before resetConnection")
+            // resetConnection();
         } catch (e) {
-            const errorMessage = {error: 'Missing element in query '+ projectType + "_add. Empty fields: `` ``.",
-                description: req.body.description || "",
-                imageName: req.file.filename || ""}
+            const errorMessage = {
+                message: "Error when fetching the project",
+                error: e,
+                projectType,
+                id: req.query.id
+            }
             console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
