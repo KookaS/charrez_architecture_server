@@ -10,36 +10,26 @@ let server: Server;
 let listID: string[] = [];
 const shell = require('shelljs');
 
-export const serverInit = async () => {
-    await shell.exec('./reset-port.sh');
-    await serverStart();
-    await app.get('/', (req, res) => res.send('Express + TypeScript Server'));
-    await createProject("villas", "villas");
-    await createProject("immeubles", "immeubles");
-    await createProject("urbanisme", "urbanisme");
-    await loadProject("villas", "villas");
+export const serverInit = () => {
+    shell.exec('./reset-port.sh');
+    serverStart();
+    createProject("villas", "villas");
+    createProject("immeubles", "immeubles");
+    createProject("urbanisme", "urbanisme");
+    loadProject("villas", "villas");
     //loadProject("immeubles", "immeubles");
     //loadProject("urbanisme", "urbanisme");
 }
 
 /// restart the server
-const resetConnection = async () => {
-    try {
-        await server.close((err => {
-            console.log("error when closing server!")
-            throw err;
-        }));
-        await serverStart();
-    }
-    catch (e) {
-        console.log(e.message)
-        await serverStart();
-    }
+const resetConnection = () => {
+        server.close();
+        serverStart();
 }
 
 /// start listening on the port
-const serverStart = async () => {
-    server = await app.listen(PORT, () => {
+const serverStart = () => {
+    server = app.listen(PORT, () => {
         console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
     });
 }
@@ -64,8 +54,8 @@ const makeID = (length: number) => {
 /// send in body title, description and date for new
 // example to upload values to db
 // await mongoInsertProject(projectType, req.file.id, imageTitle, imageDescription, imageDate);
-const createProject = async (projectType: string, dbName: string) => {
-    await app.post("/" + projectType + "/create", uploadFile(dbName), async (req, res) => {
+const createProject = (projectType: string, dbName: string) => {
+    app.post("/" + projectType + "/create", uploadFile(dbName), async (req, res) => {
         try {
             let warning = undefined;
             if (!req.body.title || !req.body.description || !req.body.date) {
@@ -96,25 +86,24 @@ const createProject = async (projectType: string, dbName: string) => {
     })
 }
 
-const loadProject = async (projectType: string, dbName: string) => {
-    await app.get("/" + projectType + "/load", async (req, res) => {
+const loadProject = (projectType: string, dbName: string) => {
+    app.get("/" + projectType + "/load", async (req, res) => {
         try {
             const id = req.query.id;
             console.log()
             if (!id) {
                 throw new Error('Missing id in in params of query');
             }
-            await mongoConnect()
             let files = await mongoFetchImage(dbName, id.toString());
             console.log("after sending")
             const resMessage = {message: 'Load successful', id, files};
-            await res.status(HttpStatus.OK).send(resMessage);
+            res.status(HttpStatus.OK).send(resMessage);
             console.log("before resetConnection")
-            await resetConnection();
+            resetConnection();
         } catch (e) {
             const errorMessage = {
                 message: "Error when fetching the project",
-                error: e.message,
+                error: e,
                 projectType,
                 id: req.query.id
             }

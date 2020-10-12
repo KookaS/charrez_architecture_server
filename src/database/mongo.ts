@@ -12,9 +12,9 @@ export const mongoConnect = async () => {
 }
 
 // closes the connection to mongodb
-export const mongoClose = async () => {
+export const mongoClose = () => {
     try {
-        await MongoHelper.disconnect();
+        MongoHelper.disconnect();
         console.log(`Closed Mongo!`);
     } catch (e) {
         console.error(`Unable to close to Mongo!`);
@@ -31,20 +31,18 @@ export const mongoInsertProject = async (dbName: string, id: string, json: any) 
         console.log(json.id + " has been inserted well!")
         await mongoClose();
     } catch (e) {
-        console.error("Unable to insert project: " + e.message)
+        console.error("Unable to insert project: ")
+        throw e;
     }
 }
 
 // fetch project in db
 export const mongoFetchImage = async (dbName: string, id: string) => {
-
-    const db = MongoHelper.db(dbName);
-    const collection = db.collection('fs.chunks');
     try {
-        let resFiles = await collection.find({find_id: id}).sort({n: 1});
-        console.log("resFiles: " + resFiles.toArray())
-
-        resFiles.toArray((err, files) => {
+        await mongoConnect();
+        const db = MongoHelper.db(dbName);
+        const collection = db.collection('fs.chunks');
+        await collection.find({find_id: id}).sort({n: 1}).toArray((err, files) => {
             if (err) throw err;
             if (!files[0] || files.length === 0) {
                 // throw new Error('Files metadata empty');
@@ -60,6 +58,8 @@ export const mongoFetchImage = async (dbName: string, id: string) => {
             mongoClose();
             return files;
         })
+
+        //console.log("resFiles: " + resFiles.toArray())
     } catch (e) {
         await mongoClose();
         throw e;
