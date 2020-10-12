@@ -23,8 +23,8 @@ export const serverInit = () => {
 
 /// restart the server
 const resetConnection = () => {
-        server.close();
-        serverStart();
+    server.close();
+    serverStart();
 }
 
 /// start listening on the port
@@ -68,10 +68,9 @@ const createProject = (projectType: string, dbName: string) => {
             }
             updateMetadata(metadata); //Static test value
             console.log(req.file.id)
-
             const resMessage = {message: 'creation successful', id: req.file.id, metadata: metadata, warning};
             res.status(HttpStatus.OK).send(resMessage);
-            await resetConnection();
+            // resetConnection();
         } catch (e) {
             const errorMessage = {
                 message: "File has not been uploaded!",
@@ -86,7 +85,7 @@ const createProject = (projectType: string, dbName: string) => {
     })
 }
 
-const loadProject = (projectType: string, dbName: string) => {
+const loadProject = async (projectType: string, dbName: string) => {
     app.get("/" + projectType + "/load", async (req, res) => {
         try {
             const id = req.query.id;
@@ -99,7 +98,7 @@ const loadProject = (projectType: string, dbName: string) => {
             const resMessage = {message: 'Load successful', id, files};
             res.status(HttpStatus.OK).send(resMessage);
             console.log("before resetConnection")
-            resetConnection();
+            // resetConnection();
         } catch (e) {
             const errorMessage = {
                 message: "Error when fetching the project",
