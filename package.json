@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/main.ts",
   "scripts": {
+    "clean": "pkill nodejs",
     "dev": "nodemon",
     "build-remove": "rimraf ./build",
     "build": "npm run build-remove && tsc",

@@ -16,7 +16,7 @@ to change permission on bash file
 
 If the port is already in use, kill it. Done with the bash file.
     
-    sudo kill $(sudo lsof -t -i:8080)
+    kill $(lsof -t -i:8080)
     
  ## start
  

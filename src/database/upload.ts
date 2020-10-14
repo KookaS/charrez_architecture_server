@@ -1,13 +1,11 @@
 import multer from "multer";
 import {MongoHelper} from "@database/helper";
+import path from "path";
+import * as fs from "fs";
+
+/*
 import GridFsStorage from 'multer-gridfs-storage';
-
-let updatedMetadata: {};
-
-// collection name is file: db.fs.files
-export const uploadFile = ( dbName: string) => {
-    let url = MongoHelper.url+"/"+dbName;
-    let storage = new GridFsStorage({
+let storage = new GridFsStorage({
         url,
         options: {useNewUrlParser: true, useUnifiedTopology: true},
         file: (req, file) => {
@@ -21,10 +19,21 @@ export const uploadFile = ( dbName: string) => {
             });
         }
     });
-    console.log("upload URL: " + url);
+ */
+
+// collection name is file: db.fs.files
+export const uploadFile = ( id: string) => {
+    const storage = multer.diskStorage({
+        destination: (req, file, callback) => {
+            const path = `./uploads`
+            fs.mkdirSync(path, { recursive: true })
+            callback(null, path)
+        },
+        filename: (req, file, callback) => {
+            callback(null, id) //Appending extension
+        }
+    });
     return multer({storage: storage}).single("file");
 }
 
-export const updateMetadata = (metadata: {}) => {
-    updatedMetadata = metadata;
-};
+
