@@ -23,15 +23,27 @@ export const mongoClose = () => {
 }
 
 // create a new project in the db
-export const mongoInsertProject = async (dbName: string, id: string, json: any) => {
-    await mongoConnect();
-    const collection = MongoHelper.db(dbName).collection(id);
+export const mongoInsertProject = async (dbName: string, id:string, json: any) => {
     try {
-        await collection.insertOne(json);
-        console.log(json.id + " has been inserted well!")
-        await mongoClose();
+        const db = MongoHelper.db(dbName);
+        db.createCollection(id, (e) => {
+            if (e) throw e;
+        });
+        await db.collection(id).insertOne(json);
+        console.log(id + " metadata has been inserted well!")
     } catch (e) {
-        console.error("Unable to insert project: ")
+        console.error(id + " metadata unable to insert!")
+        throw e;
+    }
+}
+
+export const mongoFetchProject = async (dbName: string, id:string) => {
+    try {
+        const db = MongoHelper.db(dbName);
+        return await db.collection(id).find({find_id: id}).sort({n: 1});
+    }
+    catch (e) {
+        console.error(id + " metadata unable to fetch!")
         throw e;
     }
 }
