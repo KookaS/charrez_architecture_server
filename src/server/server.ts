@@ -76,7 +76,7 @@ const createProject = (dbName: string) => {
                 error: err.message,
                 path: dbName,
                 body: req.body,
-                id: req.file.id
+                id: req.file.filename
             }
             console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
