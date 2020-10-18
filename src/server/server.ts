@@ -19,21 +19,28 @@ export const serverInit = () => {
     try {
         serverStart();
         mongoConnect();
+        loadImage();
+
+        createProject("acceuil");
+        loadAllCollections("acceuil");
 
         createProject("villas");
         loadProjectMetadata("villas");
-        loadImage("villas");
-        loadCollections("villas");
+        loadAllCollections("villas");
         addToProject("villas");
         loadProject("villas");
 
         createProject("immeubles");
         loadProjectMetadata("immeubles");
-        loadImage("immeubles");
+        loadAllCollections("immeubles");
+        addToProject("immeubles");
+        loadProject("immeubles");
 
         createProject("urbanisme");
         loadProjectMetadata("urbanisme");
-        loadImage("urbanisme");
+        loadAllCollections("urbanisme");
+        addToProject("urbanisme");
+        loadProject("urbanisme");
     } catch (err) {
         console.log(err)
     }
@@ -46,8 +53,8 @@ const serverStart = () => {
     });
 }
 
-const loadCollections = (dbName: string) => {
-    app.get("/" + dbName + "/loadCollections", async (req, res) => {
+const loadAllCollections = (dbName: string) => {
+    app.get("/" + dbName + "/loadAllCollections", async (req, res) => {
         try {
             const collections = await mongoFetchAllCollections(dbName);
             const resMessage = {message: 'fetch successful', collections};
@@ -186,8 +193,8 @@ const loadProjectMetadata = (dbName: string) => {
     });
 }
 
-const loadImage = (dbName: string) => {
-    app.get("/" + dbName + "/loadImage", async (req, res) => {
+const loadImage = () => {
+    app.get("/loadImage", async (req, res) => {
         try {
             const id = req.query.id;
             if (!id) {
@@ -200,7 +207,6 @@ const loadImage = (dbName: string) => {
             const errorMessage = {
                 message: "Download problem!",
                 error: err.message,
-                path: dbName,
                 id: req.query.id
             }
             console.log(errorMessage);
