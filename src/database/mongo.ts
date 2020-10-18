@@ -21,26 +21,41 @@ export const mongoClose = () => {
 }
 
 // create a new project in the db
-export const mongoInsertProject = async (dbName: string, id: string, json: any) => {
+export const mongoInsertProject = async (dbName: string, collection: string, json: any) => {
     try {
         const db = MongoHelper.db(dbName);
-        db.createCollection(id, (err) => {
-            if (err) throw err;
-        });
-        await db.collection(id).insertOne(json);
-        console.log("new id: " + id + " metadata has been inserted well!")
+        await db.collection(collection).insertOne(json);
+        console.log("In collection: " + collection + " metadata has been inserted well!")
     } catch (err) {
-        console.error("new id: " + id + " metadata unable to insert!")
+        console.error("In collection: " + collection + " metadata unable to insert!")
         throw err;
     }
 }
 
 export const mongoFetchProject = async (dbName: string, id: string) => {
     return new Promise(async (resolve, reject) => {
-        await MongoHelper.db(dbName).collection(id).findOne({}, (err, res) => {
+        MongoHelper.db(dbName).collection(id).findOne({_id: id}, (err, res) => {
             if (err) reject(err);
             else resolve(res);
         });
+    })
+}
+
+export const mongoFetchAllCollections = async (dbName: string) => {
+    return new Promise(async (resolve, reject) => {
+        MongoHelper.db(dbName).listCollections({}, {nameOnly: true}).toArray((err, res) => {
+            if (err) reject(err);
+            else resolve(res);
+        })
+    })
+}
+
+export const mongoFetchAllDocuments = async (dbName: string, collection: string) => {
+    return new Promise(async (resolve, reject) => {
+        MongoHelper.db(dbName).collection(collection).find().toArray((err, res)=>{
+            if (err) reject(err);
+            else resolve(res);
+        })
     })
 }
 
