@@ -1,4 +1,5 @@
 import {MongoHelper} from "@database/helper"
+import {DocumentSchema} from "@schema/mongoSchema";
 
 // connect mongodb to the right port
 export const mongoConnect = () => {
@@ -50,9 +51,27 @@ export const mongoFetchAllCollections = async (dbName: string) => {
     })
 }
 
-export const mongoFetchAllDocuments = async (dbName: string, collection: string) => {
+export const mongoFetchAllDocuments = async (dbName: string, collection: string): Promise<DocumentSchema[]> => {
     return new Promise(async (resolve, reject) => {
-        MongoHelper.db(dbName).collection(collection).find().toArray((err, res)=>{
+        MongoHelper.db(dbName).collection(collection).find().toArray((err, res: DocumentSchema[])=>{
+            if (err) reject(err);
+            else resolve(res);
+        })
+    })
+}
+
+export const mongoRemoveCollection = async (dbName: string, collection: string) => {
+    return new Promise(async (resolve, reject) => {
+        MongoHelper.db(dbName).collection(collection).drop((err, res)=>{
+            if (err) reject(err);
+            else resolve(res);
+        })
+    })
+}
+
+export const mongoRemoveDocument = async (dbName: string, collection: string, id: string) => {
+    return new Promise(async (resolve, reject) => {
+        MongoHelper.db(dbName).collection(collection).deleteOne({_id: id}, (err, res)=>{
             if (err) reject(err);
             else resolve(res);
         })
