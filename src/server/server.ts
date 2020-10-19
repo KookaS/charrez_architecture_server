@@ -7,9 +7,11 @@ import {
     mongoInsertProject,
     mongoFetchProject,
     mongoFetchAllCollections,
-    mongoFetchAllDocuments
+    mongoFetchAllDocuments, mongoRemoveCollection, mongoRemoveDocument
 } from "@database/mongo";
 import path from "path";
+import fs from "fs";
+import {DocumentSchema} from "@schema/mongoSchema";
 
 const app = express();
 const PORT = 8080;
@@ -23,24 +25,31 @@ export const serverInit = () => {
 
         createProject("acceuil");
         loadAllCollections("acceuil");
+        removeCollection("acceuil");
 
         createProject("villas");
         loadProjectMetadata("villas");
         loadAllCollections("villas");
         addToProject("villas");
         loadProject("villas");
+        removeCollection("villas");
+        removeDocument("villas");
 
         createProject("immeubles");
         loadProjectMetadata("immeubles");
         loadAllCollections("immeubles");
         addToProject("immeubles");
         loadProject("immeubles");
+        removeCollection("immeubles");
+        removeDocument("immeubles");
 
         createProject("urbanisme");
         loadProjectMetadata("urbanisme");
         loadAllCollections("urbanisme");
         addToProject("urbanisme");
         loadProject("urbanisme");
+        removeCollection("urbanisme");
+        removeDocument("urbanisme");
     } catch (err) {
         console.log(err)
     }
@@ -78,7 +87,7 @@ const loadProject = (dbName: string) => {
             if (!id) {
                 throw new Error('Missing id in query');
             }
-            const documents = await mongoFetchAllDocuments(dbName, id.toString());
+            const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, id.toString());
             const resMessage = {message: 'fetch successful', collection: id, documents};
             res.status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -213,4 +222,70 @@ const loadImage = () => {
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     });
+}
+
+const removeCollection = (dbName: string) => {
+    app.delete("/" + dbName + "/deleteCollection", uploadFile(), async (req, res) => {
+        try {
+            const collection = req.query.collection;
+            if (!collection) {
+                throw new Error('Missing collection in query');
+            }
+            const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, collection.toString());
+            documents.forEach((doc) => removeImage(doc._id));
+            await mongoRemoveCollection(dbName, collection.toString());
+            const resMessage = {message: 'removal successful', collection};
+            res.status(HttpStatus.OK).send(resMessage);
+        } catch (err) {
+            const errorMessage = {
+                message: "Upload problem!",
+                error: err.message,
+                path: dbName,
+                body: req.body,
+                id: req.file.filename
+            }
+            console.log(errorMessage);
+            res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+    })
+}
+
+const removeDocument = (dbName: string) => {
+    app.delete("/" + dbName + "/deleteDocument", uploadFile(), async (req, res) => {
+        try {
+            const collection = req.query.collection;
+            if (!collection) {
+                throw new Error('Missing collection in query');
+            }
+            const id = req.query.id;
+            if (!id) {
+                throw new Error('Missing id in query');
+            }
+            removeImage(id.toString());
+            const doc = await mongoRemoveDocument(dbName, collection.toString(), id.toString());
+            const resMessage = {message: 'removal successful', collection, id, doc};
+            res.status(HttpStatus.OK).send(resMessage);
+        } catch (err) {
+            const errorMessage = {
+                message: "Upload problem!",
+                error: err.message,
+                path: dbName,
+                body: req.body,
+                id: req.file.filename
+            }
+            console.log(errorMessage);
+            res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+    })
+}
+
+const removeImage = (id: string) => {
+    const path = `./uploads/${id}`;
+
+    fs.unlink(path, (err) => {
+        if (err) {
+            console.error(err)
+            return
+        }
+    })
 }
