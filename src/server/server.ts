@@ -10,18 +10,25 @@ import {
     mongoFetchAllDocuments, mongoRemoveCollection, mongoRemoveDocument
 } from "@database/mongo";
 import path from "path";
-import fs from "fs";
 import {DocumentSchema} from "@schema/mongoSchema";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import {generateID} from "@server/generatorID";
+import {removeImage} from "@server/image";
+import bodyParser from "body-parser"
 
+dotenv.config();
 const app = express();
-const PORT = 8080;
-let server: Server;
+app.use(bodyParser.urlencoded({extended: true}));   // for x-www-form-urlencoded
+app.use(bodyParser.json({type: 'application/*+json'}));
+
 
 export const serverInit = () => {
     try {
         serverStart();
         mongoConnect();
         loadImage();
+        authorization();
 
         createProject("acceuil");
         loadAllCollections("acceuil");
@@ -57,8 +64,8 @@ export const serverInit = () => {
 
 // start listening on the port
 const serverStart = () => {
-    server = app.listen(PORT, () => {
-        console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
+    app.listen(process.env.PORT, () => {
+        console.log(`⚡️[server]: Server is running at ${process.env.NEXT_PUBLIC_API_URL}:${process.env.PORT}`);
     });
 }
 
@@ -75,7 +82,6 @@ const loadAllCollections = (dbName: string) => {
                 path: dbName,
                 id: req.query.id
             }
-            console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     });
@@ -97,7 +103,6 @@ const loadProject = (dbName: string) => {
                 path: dbName,
                 id: req.query.id
             }
-            console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     });
@@ -134,7 +139,6 @@ const createProject = (dbName: string) => {
                 body: req.body,
                 id: req.file.filename
             }
-            console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     })
@@ -173,7 +177,6 @@ const addToProject = (dbName: string) => {
                 body: req.body,
                 id: req.file.filename
             }
-            console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     })
@@ -196,7 +199,6 @@ const loadProjectMetadata = (dbName: string) => {
                 path: dbName,
                 id: req.query.id
             }
-            console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     });
@@ -218,7 +220,6 @@ const loadImage = () => {
                 error: err.message,
                 id: req.query.id
             }
-            console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     });
@@ -244,7 +245,6 @@ const removeCollection = (dbName: string) => {
                 body: req.body,
                 id: req.file.filename
             }
-            console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     })
@@ -273,19 +273,33 @@ const removeDocument = (dbName: string) => {
                 body: req.body,
                 id: req.file.filename
             }
-            console.log(errorMessage);
             res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     })
 }
 
-const removeImage = (id: string) => {
-    const path = `./uploads/${id}`;
+const authorization = () => {
+    app.post("/account/auth", async (req, res) => {
+        try {
+            console.log(req.body)
+            const hashPassword = await bcrypt.hash(req.body.password, `${process.env.API_SALT}`);
+            let _id = undefined;
+            let created_at = undefined;
+            if (req.body.user == `${process.env.API_USER}` && hashPassword == `${process.env.API_HASH}`) {
+                _id = generateID(5);
+                created_at = Date.now();
+            } else {
+                throw new Error('user or password do not match!');
+            }
 
-    fs.unlink(path, (err) => {
-        if (err) {
-            console.error(err)
-            return
+            const resMessage = {_id, created_at};
+            res.status(HttpStatus.OK).send(resMessage);
+        } catch (err) {
+            const errorMessage = {
+                message: "Login problem!",
+                error: err.message,
+            }
+            res.status(HttpStatus.BAD_REQUEST).send(errorMessage);
         }
     })
 }

@@ -36,3 +36,6 @@ package-lock.json
 #uploaded files from front-end
 uploads
 
+# dotenv environment variables file
+.env
+

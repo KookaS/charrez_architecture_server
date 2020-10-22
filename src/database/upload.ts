@@ -1,16 +1,6 @@
 import multer from "multer";
 import * as fs from "fs";
-
-// random ID generator
-const makeID = (length: number) => {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
+import {generateID} from "@server/generatorID";
 
 export const uploadFile = () => {
     const storage = multer.diskStorage({
@@ -20,7 +10,7 @@ export const uploadFile = () => {
             callback(null, path)
         },
         filename: (req, file, callback) => {
-            callback(null, makeID(20))
+            callback(null, generateID(20))
         }
     });
     return multer({storage: storage}).single("file");
