@@ -17,13 +17,10 @@ import {generateID} from "@server/generatorID";
 import {removeImage} from "@server/image";
 import bodyParser from "body-parser"
 
-const app = express();
-// parse various different custom JSON types as JSON
-//app.use(bodyParser.json({type: 'application/*+json'}))
-//app.use(bodyParser.urlencoded({extended: true}));
-//app.use(express.json({type: 'application/json'}));
-app.use(express.json());
 dotenv.config();
+const app = express();
+app.use(bodyParser.urlencoded({extended: true}));   // for x-www-form-urlencoded
+app.use(bodyParser.json({type: 'application/*+json'}));
 
 
 export const serverInit = () => {
