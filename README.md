@@ -31,3 +31,18 @@ If the port is already in use, kill it. Done with the bash file.
  build and start (pm2 restart)
  
     npm run pm2
+    
+## .env
+
+    EXPRESS_PUBLIC_API_URL = http://localhost
+    EXPRESS_PUBLIC_API_PORT = 8080
+    API_URL_NEXT = http://localhost:3000
+    API_USER = ***
+    API_SALT = ***
+    API_HASH = ***
+    
+## CORS
+
+On top of the added lib for cors you need to send:
+
+    res.header({"Access-Control-Allow-Origin": corsOptions.origin})
