@@ -15,21 +15,17 @@ import HttpStatus from "http-status-codes"
 import dotenv from "dotenv";
 import {uploadFile} from "@database/upload"
 
-
 dotenv.config();
 const app = express();
-// app.use(bodyParser.urlencoded({extended: true}));   // for x-www-form-urlencoded
-// app.use(bodyParser.json({type: 'application/*+json'}));
 app.use(express.json());
 
 const corsOptions = {
-    origin: "*", // process.env.API_URL_NEXT
+    origin: process.env.API_URL_NEXT, //
 }
 
-// start listening on the port
 export const serverStart = () => {
     app.options('*', cors(corsOptions)) // include before other routes
-    app.listen(process.env.EXPRESS_PUBLIC_API_PORT, () => {
+    app.listen(process.env.EXPRESS_PUBLIC_API_PORT, () => { // start listening on the port
         console.log(`⚡️[server]: Server is running at ${process.env.EXPRESS_PUBLIC_API_URL}:${process.env.EXPRESS_PUBLIC_API_PORT}`);
     });
 }
@@ -55,9 +51,8 @@ export const loadProject = (dbName: string) => {
     app.get("/" + dbName + "/loadDocuments", async (req, res) => {
         try {
             const id = req.query.id;
-            if (!id) {
-                throw new Error('Missing id in query');
-            }
+            if (!id) throw new Error('Missing id in query');
+
             const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, id.toString());
             const resMessage = {message: 'fetch successful', collection: id, documents};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
@@ -78,13 +73,13 @@ export const loadProject = (dbName: string) => {
 export const createProject = (dbName: string) => {
     app.post("/" + dbName + "/create", uploadFile(), async (req, res) => {
         try {
+            if (!req.headers.authorization) throw new Error('No authorization!');
+
             let warning = undefined;
-            if (!req.body.title || !req.body.description || !req.body.date) {
-                warning = "Missing element(s) in body of query";
-            }
-            if (!req.file) {
-                warning = "No image in query";
-            }
+            if (!req.body.title || !req.body.description || !req.body.date) warning = "Missing element(s) in body of query";
+
+            if (!req.file) warning = "No image in query";
+
             const id = req.file.filename;
 
             const metadata = {
@@ -110,20 +105,17 @@ export const createProject = (dbName: string) => {
 }
 
 export const addToProject = (dbName: string) => {
-    app.post("/" + dbName + "/addToProject", uploadFile(), async (req, res) => {
+    app.post("/" + dbName + "/addDocument", uploadFile(), async (req, res) => {
         try {
-            const id = req.query.id;
-            if (!id) {
-                throw new Error('Missing id in query');
-            }
+            if (!req.headers.authorization) throw new Error('No authorization!');
+
+            const collection = req.query.collection;
+            if (!collection) throw new Error('Missing id in query');
 
             let warning = undefined;
-            if (!req.body.title) {
-                warning = "Missing title in body of query";
-            }
-            if (!req.file) {
-                warning = "No image in query";
-            }
+            if (!req.body.title) warning = "Missing title in body of query";
+
+            if (!req.file) warning = "No image in query";
 
             const metadata = {
                 _id: req.file.filename,
@@ -131,8 +123,8 @@ export const addToProject = (dbName: string) => {
                 description: req.body.description,
                 date: req.body.date,
             }
-            await mongoInsertProject(dbName, id.toString(), metadata);
-            const resMessage = {message: 'creation successful', collection: id, metadata, warning};
+            await mongoInsertProject(dbName, collection.toString(), metadata);
+            const resMessage = {message: 'creation successful', collection, metadata, warning};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
             const errorMessage = {
@@ -151,9 +143,8 @@ export const loadProjectMetadata = (dbName: string) => {
     app.get("/" + dbName + "/loadMetadata", async (req, res) => {
         try {
             const id = req.query.id;
-            if (!id) {
-                throw new Error('Missing id in query');
-            }
+            if (!id) throw new Error('Missing id in query');
+
             const metadata = await mongoFetchProject(dbName, id.toString());
             const resMessage = {message: 'fetch successful', collection: id, metadata};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
@@ -173,12 +164,12 @@ export const loadImage = () => {
     app.get("/loadImage", async (req, res) => {
         try {
             const id = req.query.id;
-            if (!id) {
-                throw new Error('Missing id in query');
-            }
-            res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).sendFile(path.join(__dirname, '../../uploads/' + id), (err) => {
-                if (err) throw err;
-            });
+            if (!id) throw new Error('Missing id in query');
+
+            res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK)
+                .sendFile(path.join(__dirname, '../../uploads/' + id), (err) => {
+                    if (err) throw err;
+                });
         } catch (err) {
             const errorMessage = {
                 message: "Download problem!",
@@ -193,10 +184,11 @@ export const loadImage = () => {
 export const removeCollection = (dbName: string) => {
     app.delete("/" + dbName + "/deleteCollection", uploadFile(), async (req, res) => {
         try {
+            if (!req.headers.authorization) throw new Error('No authorization!');
+
             const collection = req.query.collection;
-            if (!collection) {
-                throw new Error('Missing collection in query');
-            }
+            if (!collection) throw new Error('Missing collection in query');
+
             const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, collection.toString());
             documents.forEach((doc) => removeImage(doc._id));
             await mongoRemoveCollection(dbName, collection.toString());
@@ -218,14 +210,14 @@ export const removeCollection = (dbName: string) => {
 export const removeDocument = (dbName: string) => {
     app.delete("/" + dbName + "/deleteDocument", async (req, res) => {
         try {
+            if (!req.headers.authorization) throw new Error('No authorization!');
+
             const collection = req.query.collection;
-            if (!collection) {
-                throw new Error('Missing collection in query');
-            }
+            if (!collection) throw new Error('Missing collection in query');
+
             const id = req.query.id;
-            if (!id) {
-                throw new Error('Missing id in query');
-            }
+            if (!id) throw new Error('Missing id in query');
+
             removeImage(id.toString());
             const doc = await mongoRemoveDocument(dbName, collection.toString(), id.toString());
             const resMessage = {message: 'removal successful', collection, id, doc};
@@ -246,16 +238,14 @@ export const removeDocument = (dbName: string) => {
 export const authorization = () => {
     app.post("/account/auth", async (req, res) => {
         try {
-            console.log(req.body)
             const hashPassword = await bcrypt.hash(req.body.password, `${process.env.API_SALT}`);
             let _id = undefined;
             let created_at = undefined;
             if (req.body.user == `${process.env.API_USER}` && hashPassword == `${process.env.API_HASH}`) {
                 _id = generateID(5);
                 created_at = Date.now();
-            } else {
-                throw new Error('user or password do not match!');
-            }
+            } else throw new Error('user or password do not match!');
+
 
             const resMessage = {_id, created_at};
             console.log(resMessage)
