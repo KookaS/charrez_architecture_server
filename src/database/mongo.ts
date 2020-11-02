@@ -7,6 +7,7 @@ export const mongoConnect = () => {
         console.log(`Connected to Mongo!`)
     }).catch((err) => {
         console.error(`Unable to connect to Mongo!`, err)
+        throw err;
     });
 }
 
@@ -33,6 +34,7 @@ export const mongoInsertProject = async (dbName: string, collection: string, jso
     }
 }
 
+// collect document into collection
 export const mongoFetchProject = async (dbName: string, id: string) => {
     return new Promise(async (resolve, reject) => {
         MongoHelper.db(dbName).collection(id).findOne({_id: id}, (err, res) => {
@@ -42,6 +44,7 @@ export const mongoFetchProject = async (dbName: string, id: string) => {
     })
 }
 
+//collect all collections
 export const mongoFetchAllCollections = async (dbName: string) => {
     return new Promise(async (resolve, reject) => {
         MongoHelper.db(dbName).listCollections({}, {nameOnly: true}).toArray((err, res) => {
@@ -51,6 +54,7 @@ export const mongoFetchAllCollections = async (dbName: string) => {
     })
 }
 
+// collect all documents into collection
 export const mongoFetchAllDocuments = async (dbName: string, collection: string): Promise<DocumentSchema[]> => {
     return new Promise(async (resolve, reject) => {
         MongoHelper.db(dbName).collection(collection).find().toArray((err, res: DocumentSchema[])=>{
@@ -60,6 +64,7 @@ export const mongoFetchAllDocuments = async (dbName: string, collection: string)
     })
 }
 
+// delete a collection
 export const mongoRemoveCollection = async (dbName: string, collection: string) => {
     return new Promise(async (resolve, reject) => {
         MongoHelper.db(dbName).collection(collection).drop((err, res)=>{
@@ -69,6 +74,7 @@ export const mongoRemoveCollection = async (dbName: string, collection: string) 
     })
 }
 
+// delete a document into collection
 export const mongoRemoveDocument = async (dbName: string, collection: string, id: string) => {
     return new Promise(async (resolve, reject) => {
         MongoHelper.db(dbName).collection(collection).deleteOne({_id: id}, (err, res)=>{

@@ -9,7 +9,7 @@ import {
     serverStart
 } from "@server/routes";
 
-
+// has all the possible requests
 export const serverInit = () => {
     try {
         serverStart();

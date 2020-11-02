@@ -1,0 +1,14 @@
+# build files from ts to js
+build
+
+.idea
+
+#package.json generated file at compilation
+# package-lock.json
+
+# Dependency directories
+# node_modules
+
+package-lock.json
+
+.gitignore
