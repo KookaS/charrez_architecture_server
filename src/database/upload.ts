@@ -2,6 +2,7 @@ import multer from "multer";
 import * as fs from "fs";
 import {generateID} from "@server/generatorID";
 
+//store the "file" from request into /uploads
 export const uploadFile = () => {
     const storage = multer.diskStorage({
         destination: (req, file, callback) => {

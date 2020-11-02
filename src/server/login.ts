@@ -1,7 +1,7 @@
 import {generateID} from "@server/generatorID";
 import bcrypt from "bcrypt";
-import HttpStatus from "http-status-codes";
 
+// logs a new user
 export const createLogin = async () => {
     const user = "admin";
     console.log("user: " + user);

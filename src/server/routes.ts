@@ -23,6 +23,7 @@ const corsOptions = {
     origin: process.env.API_URL_NEXT, //
 }
 
+// server init
 export const serverStart = () => {
     app.options('*', cors(corsOptions)) // include before other routes
     app.listen(process.env.EXPRESS_PUBLIC_API_PORT, () => { // start listening on the port
@@ -30,6 +31,7 @@ export const serverStart = () => {
     });
 }
 
+// upload all collections
 export const loadAllCollections = (dbName: string) => {
     app.get("/" + dbName + "/loadAllCollections", async (req, res) => {
         try {
@@ -47,6 +49,8 @@ export const loadAllCollections = (dbName: string) => {
         }
     });
 }
+
+// upload collection
 export const loadProject = (dbName: string) => {
     app.get("/" + dbName + "/loadDocuments", async (req, res) => {
         try {
@@ -69,7 +73,7 @@ export const loadProject = (dbName: string) => {
 }
 
 
-// send in body title, description and date for new
+// download new collection
 export const createProject = (dbName: string) => {
     app.post("/" + dbName + "/create", uploadFile(), async (req, res) => {
         try {
@@ -104,6 +108,7 @@ export const createProject = (dbName: string) => {
     })
 }
 
+// download new document
 export const addToProject = (dbName: string) => {
     app.post("/" + dbName + "/addDocument", uploadFile(), async (req, res) => {
         try {
@@ -139,6 +144,7 @@ export const addToProject = (dbName: string) => {
     })
 }
 
+// upload information
 export const loadProjectMetadata = (dbName: string) => {
     app.get("/" + dbName + "/loadMetadata", async (req, res) => {
         try {
@@ -160,6 +166,7 @@ export const loadProjectMetadata = (dbName: string) => {
     });
 }
 
+// upload an image
 export const loadImage = () => {
     app.get("/loadImage", async (req, res) => {
         try {
@@ -181,6 +188,7 @@ export const loadImage = () => {
     });
 }
 
+// removes a collection
 export const removeCollection = (dbName: string) => {
     app.delete("/" + dbName + "/deleteCollection", uploadFile(), async (req, res) => {
         try {
@@ -207,6 +215,7 @@ export const removeCollection = (dbName: string) => {
     })
 }
 
+// removes a document
 export const removeDocument = (dbName: string) => {
     app.delete("/" + dbName + "/deleteDocument", async (req, res) => {
         try {
@@ -235,6 +244,7 @@ export const removeDocument = (dbName: string) => {
     })
 }
 
+// check if pw & user match environment values
 export const authorization = () => {
     app.post("/account/auth", async (req, res) => {
         try {
@@ -248,7 +258,6 @@ export const authorization = () => {
 
 
             const resMessage = {_id, created_at};
-            console.log(resMessage)
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
             const errorMessage = {

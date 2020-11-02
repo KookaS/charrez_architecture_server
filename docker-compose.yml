@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: express-image/node-web-app:latest
+    container_name: charrez-server
+    restart: unless-stopped
+    environment:
+      - MONGO_HOSTNAME=db
+      - ENGINE_HOST=http://localhost:8000
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /app:/app
+    ports:
+      - 8080:8080
+    networks:
+      - app-network
+
+  front-end:
+    image: next-image/node-web-app:latest
+    container_name: charrez-gui
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+
+  db:
+    image: mongo:3.6-xenial
+    container_name: db
+    environment:
+      - MONGO_INITDB_DATABASE=acceuil
+      - MONGO_INITDB_DATABASE=villas
+      - MONGO_INITDB_DATABASE=immeubles
+      - MONGO_INITDB_DATABASE=urbanisme
+    restart: unless-stopped
+    volumes:
+      - /data/db:/data/db
+    ports:
+      - '27017-27019:27017-27019'
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+  node_modules:

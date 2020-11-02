@@ -30,7 +30,27 @@ If the port is already in use, kill it. Done with the bash file.
      
  build and start (pm2 restart)
  
+    sudo mongod
+ 
     npm run pm2
+    
+## PM2
+
+    pm2 start [main file path]
+    
+    pm2 ls
+    
+        pm2 describe 0
+    
+        pm2 monit
+        
+    pm2 logs
+    
+    pm2 stop all 
+    
+    pm2 restart all
+    
+    pm2 delete all
     
 ## .env
 
@@ -46,3 +66,43 @@ If the port is already in use, kill it. Done with the bash file.
 On top of the added lib for cors you need to send:
 
     res.header({"Access-Control-Allow-Origin": corsOptions.origin})
+    
+## Docker
+
+    sudo docker build -t express-image/node-web-app .
+   
+    sudo docker images
+    
+    sudo docker run -d --name charrez-server express-image/node-web-app
+
+    sudo docker ps -a
+    
+    sudo docker logs [container id]
+    
+    sudo docker exec -it [container id] /bin/bash   or  bash
+    
+remove images:
+
+    sudo docker rmi $(sudo docker images -aq)
+    
+stop container(s):
+
+    sudo docker container stop [container_id]or[container_name]
+    
+    sudo docker container stop $(sudo docker container ls -aq)
+    
+remove stopped container(s):
+
+    sudo docker container rm [container_id]or[container_name]
+    
+    sudo docker container rm $(sudo docker container ls -aq)
+    
+restart stopped container(s):
+
+    sudo docker start -ai [container_name]
+    
+## Docker compose
+
+    sudo docker pull mongo:latest
+
+    sudo docker-compose up
