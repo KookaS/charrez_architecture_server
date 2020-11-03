@@ -3,12 +3,9 @@ build
 
 .idea
 
-#package.json generated file at compilation
-# package-lock.json
-
 # Dependency directories
-# node_modules
+node_modules
 
-package-lock.json
+npm-debug.log
 
 .gitignore

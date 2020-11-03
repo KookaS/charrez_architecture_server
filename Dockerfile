@@ -1,27 +1,41 @@
 FROM node:12-alpine AS builder
 
-RUN apk add --no-cache git
+RUN apk update && apk add yarn curl bash && apk add --no-cache git
 
-WORKDIR /temp/server
+RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 
-COPY . .
+WORKDIR /usr/src/app
+
+COPY package*.json ./
 
 RUN npm install
 
+COPY . .
+
 RUN npm run build
 
-RUN rm -rf ./node_modules
+RUN npm prune --production
 
-RUN JOBS=MAX npm i --production
+# run node prune
+RUN /usr/local/bin/node-prune
+
+#display unused dependencies
+RUN du -sh ./node_modules/* | sort -nr | grep '\dM.*'
+
+
 
 FROM node:12-alpine
 
-RUN apk add ca-certificates
+RUN apk --no-cache add ca-certificates
 
-COPY --from=builder /temp/server/build/ /temp/server/reset-port.sh /temp/server/node_modules  /app/
+WORKDIR /usr/src/app
 
-WORKDIR /app
+COPY --from=builder /usr/src/app/reset-port.sh  ./
+
+COPY --from=builder /usr/src/app/build/  ./build/
+
+COPY --from=builder /usr/src/app/node_modules  ./node_modules
 
 EXPOSE 8080
 
-CMD [ "node", "./src/main.js" ]
+CMD [ "node", "build/src/main.js" ]

@@ -11,6 +11,8 @@ services:
     environment:
       - MONGO_HOSTNAME=db
       - ENGINE_HOST=http://localhost:8000
+    env_file:
+      - .env
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - /app:/app
@@ -27,18 +29,13 @@ services:
       - 3000:3000
 
   db:
-    image: mongo:3.6-xenial
+    image: mongo:4.0.20-xenial
     container_name: db
-    environment:
-      - MONGO_INITDB_DATABASE=acceuil
-      - MONGO_INITDB_DATABASE=villas
-      - MONGO_INITDB_DATABASE=immeubles
-      - MONGO_INITDB_DATABASE=urbanisme
     restart: unless-stopped
     volumes:
-      - /data/db:/data/db
+      - mongodata:/data/db
     ports:
-      - '27017-27019:27017-27019'
+      - 27017:27017
     networks:
       - app-network
 
@@ -47,5 +44,5 @@ networks:
     driver: bridge
 
 volumes:
-  dbdata:
+  mongodata:
   node_modules:

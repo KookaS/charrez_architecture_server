@@ -63,7 +63,7 @@ If the port is already in use, kill it. Done with the bash file.
     
 ## CORS
 
-On top of the added lib for cors you need to send:
+On top of the added lib for CORS you need to send:
 
     res.header({"Access-Control-Allow-Origin": corsOptions.origin})
     
@@ -99,10 +99,14 @@ remove stopped container(s):
     
 restart stopped container(s):
 
-    sudo docker start -ai [container_name]
+    sudo docker start [container_name]
     
 ## Docker compose
 
-    sudo docker pull mongo:latest
+    sudo docker-compose down -v
 
     sudo docker-compose up
+    
+To access db bash directly
+
+    sudo docker exec -it $(sudo docker ps -af "name=db" -q) bash
