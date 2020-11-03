@@ -7,6 +7,21 @@ export class MongoHelper {
 
     constructor() {
     }
+    public static create(dbName: string): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            MongoClient.connect(this.url+"/"+dbName, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            }, (err, client: MongoClient) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(client.close());
+                }
+            });
+        });
+    }
+
 
     public static connect(): Promise<any> {
         return new Promise<any>((resolve, reject) => {

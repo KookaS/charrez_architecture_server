@@ -1,4 +1,3 @@
-import {mongoConnect} from "@database/mongo";
 import {
     addToProject,
     authorization,
@@ -8,12 +7,18 @@ import {
     removeCollection, removeDocument,
     serverStart
 } from "@server/routes";
+import {MongoHelper} from "@database/helper";
 
 // has all the possible requests
-export const serverInit = () => {
+export const serverInit = async () => {
     try {
         serverStart();
-        mongoConnect();
+        await MongoHelper.create("acceuil");
+        await MongoHelper.create("villas");
+        await MongoHelper.create("immeubles");
+        await MongoHelper.create("urbanisme");
+        await MongoHelper.connect();
+        console.log("Connected to mongoDB!")
         loadImage();
         authorization();
 
@@ -45,5 +50,6 @@ export const serverInit = () => {
         removeCollection("urbanisme");
         removeDocument("urbanisme");
     } catch (err) {
+        throw err
     }
 }

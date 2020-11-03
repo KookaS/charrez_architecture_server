@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "nodemon",
     "build-remove": "rimraf ./build",
-    "build": "npm run build-remove && tsc && npm run fix-paths && npm run upload",
-    "upload": "cp -r uploads build/",
     "fix-paths": "tspath -f",
-    "start:build": "npm run build && node build/src/main.js",
+    "build": "npm run build-remove && tsc && npm run fix-paths",
+    "upload": "cp -r uploads build/",
+    "build:uploads": "npm run build && npm run upload",
+    "start:build": "npm run build:uploads && node build/src/main.js",
     "start": "node build/src/main.js",
-    "pm2:build": "npm run build && pm2 start build/src/main.js --watch",
+    "pm2:build": "npm run build:uploads && pm2 start build/src/main.js --watch",
     "pm2": "pm2 start build/src/main.js --watch"
   },
   "repository": {
