@@ -54,12 +54,13 @@ If the port is already in use, kill it. Done with the bash file.
     
 ## .env
 
-    EXPRESS_PUBLIC_API_URL = http://localhost
-    EXPRESS_PUBLIC_API_PORT = 8080
-    API_URL_NEXT = http://localhost:3000
-    API_USER = ***
-    API_SALT = ***
-    API_HASH = ***
+    EXPRESS_PUBLIC_API_URL="http://localhost"
+    EXPRESS_PUBLIC_API_PORT="8080"
+    API_URL_NEXT="*"        or http://localhost:3000
+    MONGO_HOSTNAME="db"     or localhost
+    API_USER=***
+    API_SALT=***
+    API_HASH=***
     
 ## CORS
 
@@ -69,11 +70,11 @@ On top of the added lib for CORS you need to send:
     
 ## Docker
 
-    sudo docker build -t express-image/node-web-app .
+    sudo docker build -t express-image .
    
     sudo docker images
     
-    sudo docker run -d --name charrez-server express-image/node-web-app
+    sudo docker run -d --name charrez-server express-image
 
     sudo docker ps -a
     
@@ -104,9 +105,10 @@ restart stopped container(s):
 ## Docker compose
 
     sudo docker-compose down -v
-
-    sudo docker-compose up
+    
+    sudo docker-compose up --build
     
 To access db bash directly
 
     sudo docker exec -it $(sudo docker ps -af "name=db" -q) bash
+    
