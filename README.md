@@ -106,7 +106,9 @@ restart stopped container(s):
 
     sudo docker-compose down -v
     
-    sudo docker-compose up --build
+    sudo docker-compose up -d
+    
+    sudo docker-compose logs
     
 To access db bash directly
 
