@@ -1,4 +1,3 @@
-import {mongoConnect} from "@database/mongo";
 import {
     addToProject,
     authorization,
@@ -8,12 +7,13 @@ import {
     removeCollection, removeDocument,
     serverStart
 } from "@server/routes";
+import {mongoConnect} from "@database/mongo";
 
 // has all the possible requests
 export const serverInit = () => {
     try {
-        serverStart();
         mongoConnect();
+        serverStart();
         loadImage();
         authorization();
 
@@ -45,5 +45,6 @@ export const serverInit = () => {
         removeCollection("urbanisme");
         removeDocument("urbanisme");
     } catch (err) {
+        console.log(err.message)
     }
 }

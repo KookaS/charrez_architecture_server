@@ -5,47 +5,32 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: express-image/node-web-app:latest
+    image: express-image:latest
     container_name: charrez-server
     restart: unless-stopped
-    environment:
-      - MONGO_HOSTNAME=db
-      - ENGINE_HOST=http://localhost:8000
-    volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    - /app:/app
+    env_file:
+      - .env
     ports:
       - 8080:8080
     networks:
-      - app-network
+      - server-db
 
   front-end:
-    image: next-image/node-web-app:latest
+    image: next-image:latest
     container_name: charrez-gui
     restart: unless-stopped
     ports:
       - 3000:3000
 
   db:
-    image: mongo:3.6-xenial
+    image: mongo:4.0.20-xenial
     container_name: db
-    environment:
-      - MONGO_INITDB_DATABASE=acceuil
-      - MONGO_INITDB_DATABASE=villas
-      - MONGO_INITDB_DATABASE=immeubles
-      - MONGO_INITDB_DATABASE=urbanisme
     restart: unless-stopped
-    volumes:
-      - /data/db:/data/db
     ports:
-      - '27017-27019:27017-27019'
+      - 27017:27017
     networks:
-      - app-network
+      - server-db
 
 networks:
-  app-network:
+  server-db:
     driver: bridge
-
-volumes:
-  dbdata:
-  node_modules:

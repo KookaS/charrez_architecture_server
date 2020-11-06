@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "nodemon",
     "build-remove": "rimraf ./build",
-    "build": "npm run build-remove && tsc && npm run fix-paths && cp -r uploads build/",
     "fix-paths": "tspath -f",
-    "start": "npm run build && node build/src/main.js",
-    "pm2:build": "npm run build && pm2 start build/src/main.js --watch",
+    "build": "npm run build-remove && tsc && npm run fix-paths",
+    "upload": "cp -r uploads build/",
+    "build:uploads": "npm run build && npm run upload",
+    "start:build": "npm run build:uploads && node build/src/main.js",
+    "start": "node build/src/main.js",
+    "pm2:build": "npm run build:uploads && pm2 start build/src/main.js --watch",
     "pm2": "pm2 start build/src/main.js --watch"
   },
   "repository": {
@@ -30,8 +33,6 @@
     "http-status-codes": "^2.1.4",
     "mongodb": "^3.6.2",
     "multer": "^1.4.2",
-    "http-status-code": "^2.1.0",
-    "pm2": "^4.5.0",
     "shelljs": "^0.8.4",
     "bcrypt": "^5.0.0",
     "dotenv": "^8.2.0",

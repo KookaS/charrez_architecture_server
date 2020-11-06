@@ -35,6 +35,7 @@ export const serverStart = () => {
 export const loadAllCollections = (dbName: string) => {
     app.get("/" + dbName + "/loadAllCollections", async (req, res) => {
         try {
+            console.log("INSIDE LOAD ALL")
             const collections = await mongoFetchAllCollections(dbName);
             const resMessage = {message: 'fetch successful', collections};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);

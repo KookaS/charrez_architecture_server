@@ -3,7 +3,7 @@ import {MongoClient} from 'mongodb';
 // Handler around MongoDB
 export class MongoHelper {
     public static client: MongoClient;
-    public static url: string = "mongodb://localhost:27017";
+    public static url: string = `mongodb://${process.env.MONGO_HOSTNAME}:27017`;
 
     constructor() {
     }
