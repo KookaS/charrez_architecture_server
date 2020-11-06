@@ -17,9 +17,9 @@ export const serverInit = () => {
         loadImage();
         authorization();
 
-        createProject("acceuil");
-        loadAllCollections("acceuil");
-        removeCollection("acceuil");
+        createProject("accueil");
+        loadAllCollections("accueil");
+        removeCollection("accueil");
 
         createProject("villas");
         loadProjectMetadata("villas");
