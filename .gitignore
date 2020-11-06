@@ -34,7 +34,7 @@ build
 package-lock.json
 
 #uploaded files from front-end
-uploads
+uploads/*
 
 # dotenv environment variables file
 .env
