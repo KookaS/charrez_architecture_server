@@ -1,9 +1,12 @@
 import {MongoClient} from 'mongodb';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Handler around MongoDB
 export class MongoHelper {
     public static client: MongoClient;
-    public static url: string = `mongodb://${process.env.MONGO_HOSTNAME}:27017`;
+    public static url: string = `mongodb://${process.env.API_MONGO_HOSTNAME}:27017`;
 
     constructor() {
     }
@@ -34,6 +37,7 @@ export class MongoHelper {
     };
 
     public static db(dbName: string) {
+        console.log(MongoHelper.url)
         return this.client.db(dbName)
     }
 }
