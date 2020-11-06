@@ -56,7 +56,7 @@ If the port is already in use, kill it. Done with the bash file.
 
     EXPRESS_PUBLIC_API_URL="http://localhost"
     EXPRESS_PUBLIC_API_PORT="8080"
-    API_URL_NEXT="*"        or http://localhost:3000
+    API_URL_NEXT="https://architecture.charrez.ch"  or  http://localhost:3000   or  *
     API_MONGO_HOSTNAME="db"     or localhost
     API_USER=***
     API_SALT=***
