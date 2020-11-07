@@ -17,7 +17,7 @@ RUN npm run build
 RUN npm prune --production
 
 # run node prune
-RUN /tmp/local/bin/node-prune
+RUN /usr/local/bin/node-prune
 
 #display unused dependencies
 RUN du -sh ./node_modules/* | sort -nr | grep '\dM.*'
