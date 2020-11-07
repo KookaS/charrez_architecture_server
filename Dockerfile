@@ -4,7 +4,7 @@ RUN apk update && apk add yarn curl bash && apk add --no-cache git
 
 RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 
-WORKDIR /usr/src/app
+WORKDIR /tmp/src/app
 
 COPY package*.json ./
 
@@ -17,7 +17,7 @@ RUN npm run build
 RUN npm prune --production
 
 # run node prune
-RUN /usr/local/bin/node-prune
+RUN /tmp/local/bin/node-prune
 
 #display unused dependencies
 RUN du -sh ./node_modules/* | sort -nr | grep '\dM.*'
@@ -30,13 +30,13 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /usr/src/app
 
-COPY --from=builder /usr/src/app/reset-port.sh  ./
+COPY --from=builder /tmp/src/app/reset-port.sh  ./
 
-COPY --from=builder /usr/src/app/build/  ./
+COPY --from=builder /tmp/src/app/build/  ./
 
 RUN mkdir -m777 ./uploads
 
-COPY --from=builder /usr/src/app/node_modules  ./node_modules
+COPY --from=builder /tmp/src/app/node_modules  ./node_modules
 
 EXPOSE 8080
 
