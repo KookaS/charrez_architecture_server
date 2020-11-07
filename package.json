@@ -8,11 +8,12 @@
     "build-remove": "rimraf ./build",
     "fix-paths": "tspath -f",
     "build": "npm run build-remove && tsc && npm run fix-paths",
-    "uploads": "mkdir build/uploads && cp -r uploads/* build/uploads/",
-    "build:uploads": "npm run build && npm run uploads",
-    "start:build": "npm run build:uploads && node build/src/main.js",
+    "uploads:mk": "mkdir build/uploads",
+    "uploads:cp": "cp -r uploads/* build/uploads/",
+    "build:uploads": "npm run build && npm run uploads:mk",
+    "start:build": "npm run build:uploads && npm run uploads:cp && node build/src/main.js",
     "start": "node build/src/main.js",
-    "pm2:build": "npm run build:uploads && pm2 start build/src/main.js --watch",
+    "pm2:build": "npm run build:uploads && npm run uploads:cp && pm2 start build/src/main.js --watch",
     "pm2": "pm2 start build/src/main.js --watch"
   },
   "repository": {
