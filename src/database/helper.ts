@@ -37,7 +37,6 @@ export class MongoHelper {
     };
 
     public static db(dbName: string) {
-        console.log(MongoHelper.url)
         return this.client.db(dbName)
     }
 }
