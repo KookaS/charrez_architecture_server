@@ -1,6 +1,8 @@
 FROM node:12-alpine AS builder
 
-RUN apk update && apk add yarn curl bash && apk add --no-cache git
+RUN apk add --no-cache git
+
+# RUN apk update && apk add yarn curl bash && 
 
 # RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 
@@ -19,7 +21,7 @@ RUN npm prune --production
 # run node prune
 # RUN /usr/local/bin/node-prune
 
-#display unused dependencies
+# display unused dependencies
 # RUN du -sh ./node_modules/* | sort -nr | grep '\dM.*'
 
 
