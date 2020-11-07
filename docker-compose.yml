@@ -30,6 +30,8 @@ services:
       - 27017:27017
     networks:
       - server-db
+    volumes:
+      - /data/db:/data/db
 
 networks:
   server-db:
