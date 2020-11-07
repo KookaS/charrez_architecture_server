@@ -12,7 +12,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build:uploads
+RUN npm run build
 
 RUN npm prune --production
 
@@ -32,10 +32,12 @@ WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/reset-port.sh  ./
 
-COPY --from=builder /usr/src/app/build/  ./build/
+COPY --from=builder /usr/src/app/build/  ./
+
+RUN mkdir -m777 ./uploads
 
 COPY --from=builder /usr/src/app/node_modules  ./node_modules
 
 EXPOSE 8080
 
-CMD [ "node", "build/src/main.js" ]
+CMD [ "node", "src/main.js" ]
