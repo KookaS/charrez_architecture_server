@@ -30,7 +30,7 @@ FROM node:12-alpine
 
 RUN apk --no-cache add ca-certificates
 
-WORKDIR /app/server/
+WORKDIR /app/node-serv/
 
 COPY --from=builder /tmp/src/app/reset-port.sh /tmp/src/app/build/ ./
 

@@ -61,7 +61,7 @@ If the port is already in use, kill it. Done with the bash file.
     API_USER=***
     API_SALT=***
     API_HASH=***
-    API_IMG="../../uploads"     or  /app/img/uploads
+    API_IMG="../../uploads"     or  ../../../img/uploads
     
 ## CORS
 
