@@ -2,7 +2,7 @@ FROM node:12-alpine AS builder
 
 RUN apk add --no-cache git
 
-# RUN apk update && apk add yarn curl bash && 
+# RUN apk update && apk add yarn curl bash
 
 # RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 
@@ -30,13 +30,9 @@ FROM node:12-alpine
 
 RUN apk --no-cache add ca-certificates
 
-WORKDIR /usr/src/app
+WORKDIR /app/server/
 
-COPY --from=builder /tmp/src/app/reset-port.sh  ./
-
-COPY --from=builder /tmp/src/app/build/  ./
-
-RUN mkdir -m777 ./uploads
+COPY --from=builder /tmp/src/app/reset-port.sh /tmp/src/app/build/ ./
 
 COPY --from=builder /tmp/src/app/node_modules  ./node_modules
 

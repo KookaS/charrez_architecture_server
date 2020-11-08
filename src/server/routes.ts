@@ -174,7 +174,7 @@ export const loadImage = () => {
             if (!id) throw new Error('Missing id in query');
 
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK)
-                .sendFile(path.join(__dirname, '../../uploads/' + id), (err) => {
+                .sendFile(path.join(__dirname, `${process.env.API_IMG}/` + id), (err) => {
                     if (err) throw err;
                 });
         } catch (err) {
