@@ -62,6 +62,7 @@ If the port is already in use, kill it. Done with the bash file.
     API_SALT=***
     API_HASH=***
     API_IMG="../../uploads"     or  ../../../img/uploads
+    VOLUME_DB=db_charrez_mongo
     
 ## CORS
 
