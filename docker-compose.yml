@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.8'
 
 services:
   server:
@@ -11,7 +11,9 @@ services:
     env_file:
       - .env
     volumes:
-      - img_uploads:/app/img/uploads
+      - type: bind
+        source: /app/img/uploads
+        target: /app/img/uploads
     ports:
       - 8080:8080
     networks:
@@ -33,7 +35,9 @@ services:
     networks:
       - server-db
     volumes:
-      - data_db:/data/db
+      - type: volume
+        source: data_db
+        target: /data/db
 
 networks:
   server-db:
@@ -42,5 +46,3 @@ networks:
 volumes:
   data_db:
     name: ${VOLUME_DB}
-  img_uploads:
-    name: ${VOLUME_IMG}
