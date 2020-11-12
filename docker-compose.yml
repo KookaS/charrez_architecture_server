@@ -11,9 +11,7 @@ services:
     env_file:
       - .env
     volumes:
-      - type: bind
-        source: /app/img/uploads
-        target: /app/img/uploads
+      - /app/img/uploads:/app/img/uploads
     ports:
       - 8080:8080
     networks:
@@ -35,9 +33,7 @@ services:
     networks:
       - server-db
     volumes:
-      - type: volume
-        source: data_db
-        target: /data/db
+      - data_db:/data/db
 
 networks:
   server-db:
