@@ -33,7 +33,7 @@ services:
     networks:
       - server-db
     volumes:
-      - data/db:/data/db
+      - /data/db:/data/db
 
 networks:
   server-db:
