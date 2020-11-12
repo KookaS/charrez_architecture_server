@@ -61,7 +61,7 @@ If the port is already in use, kill it. Done with the bash file.
     API_USER=***
     API_SALT=***
     API_HASH=***
-    API_IMG="../../uploads"     or  /app/img/uploads
+    VOLUME_DB=***
     
 ## CORS
 
@@ -105,7 +105,7 @@ restart stopped container(s):
     
 ## Docker compose
 
-    sudo docker-compose down -v
+    sudo docker-compose down
     
     sudo docker-compose up -d
     
