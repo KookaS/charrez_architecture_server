@@ -33,12 +33,8 @@ services:
     networks:
       - server-db
     volumes:
-      - data_db:/data/db
+      - data/db:/data/db
 
 networks:
   server-db:
     driver: bridge
-
-volumes:
-  data_db:
-    name: ${VOLUME_DB}
