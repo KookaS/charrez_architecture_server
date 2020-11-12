@@ -11,7 +11,6 @@ export const uploadFile = () => {
     const storage = multer.diskStorage({
         destination: (req, file, callback) => {
             const path = `${process.env.API_IMG}`
-            console.log(path)
             fs.mkdirSync(path, { recursive: true })
             callback(null, path)
         },
