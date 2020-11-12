@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 
 services:
   server:
@@ -11,7 +11,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /app/img/uploads:/app/img/uploads
+      - img_uploads:/app/img/uploads
     ports:
       - 8080:8080
     networks:
@@ -33,12 +33,14 @@ services:
     networks:
       - server-db
     volumes:
-      - web_data:/data/db
+      - data_db:/data/db
 
 networks:
   server-db:
     driver: bridge
 
 volumes:
-  web_data:
-    name: ${VOLUME_ID}
+  data_db:
+    name: ${VOLUME_DB}
+  img_uploads:
+    name: ${VOLUME_IMG}
