@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   server:
@@ -38,3 +38,7 @@ services:
 networks:
   server-db:
     driver: bridge
+
+volumes:
+  front_db:
+  data_db:

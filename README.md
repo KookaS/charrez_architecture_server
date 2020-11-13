@@ -61,7 +61,7 @@ If the port is already in use, kill it. Done with the bash file.
     API_USER=***
     API_SALT=***
     API_HASH=***
-    API_IMG="../../uploads"     or  /app/img/uploads
+    API_IMG=./uploads        or ../img/uploads
     
 ## CORS
 
@@ -113,5 +113,5 @@ restart stopped container(s):
     
 To access db bash directly
 
-    sudo docker exec -it $(sudo docker ps -af "name=db" -q) bash
+    sudo docker exec -it $(sudo docker ps -af "name=db" -q) sh
     
