@@ -11,7 +11,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /app:/app
+      - back_db:/app/img/uploads
     ports:
       - 8080:8080
     networks:
@@ -33,12 +33,12 @@ services:
     networks:
       - server-db
     volumes:
-      - /data/db:/data/db
+      - data_db:/data/db
 
 networks:
   server-db:
     driver: bridge
 
 volumes:
-  front_db:
+  back_db:
   data_db:
