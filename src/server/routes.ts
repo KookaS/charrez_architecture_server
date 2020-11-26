@@ -54,11 +54,11 @@ export const loadAllCollections = (dbName: string) => {
 export const loadProject = (dbName: string) => {
     app.get("/" + dbName + "/loadDocuments", async (req, res) => {
         try {
-            const id = req.query.id;
-            if (!id) throw new Error('Missing id in query');
+            const collection = req.query.collection;
+            if (!collection) throw new Error('Missing id in query');
 
-            const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, id.toString());
-            const resMessage = {message: 'fetch successful', collection: id, documents};
+            const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, collection.toString());
+            const resMessage = {message: 'fetch successful', collection, documents};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
             const errorMessage = {
