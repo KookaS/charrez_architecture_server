@@ -11,7 +11,7 @@ dotenv.config();
 export const uploadFile = () => {
     const storage = multer.diskStorage({
         destination: (req, file, callback) => {
-            fs.mkdirSync(`${process.env.API_IMG}`, { recursive: true })
+            fs.mkdirSync(path.resolve(`${process.env.API_IMG}`), { recursive: true })
             callback(null, `${process.env.API_IMG}`)
         },
         filename: (req, file, callback) => {

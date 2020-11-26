@@ -16,7 +16,7 @@ to change permission on bash file
 
 If the port is already in use, kill it. Done with the bash file.
     
-    kill $(lsof -t -i:8080)
+    sudo kill $(sudo lsof -t -i:8080)
     
  ## start
  
@@ -61,7 +61,7 @@ If the port is already in use, kill it. Done with the bash file.
     API_USER=***
     API_SALT=***
     API_HASH=***
-    API_IMG=./uploads        or ../img/uploads
+    API_IMG=/app/img/uploads
     
 ## CORS
 
