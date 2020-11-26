@@ -16,7 +16,7 @@ to change permission on bash file
 
 If the port is already in use, kill it. Done with the bash file.
     
-    kill $(lsof -t -i:8080)
+    sudo kill $(sudo lsof -t -i:8080)
     
  ## start
  
@@ -53,15 +53,14 @@ If the port is already in use, kill it. Done with the bash file.
     pm2 delete all
     
 ## .env
-
     EXPRESS_PUBLIC_API_URL="http://localhost"
     EXPRESS_PUBLIC_API_PORT="8080"
     API_URL_NEXT="https://architecture.charrez.ch"  or  http://localhost:3000   or  *
-    API_MONGO_HOSTNAME="db"     or  localhost
+    API_MONGO_HOSTNAME="db"     or localhost
     API_USER=***
     API_SALT=***
     API_HASH=***
-    VOLUME_DB=***
+    API_IMG=/app/img/uploads
     
 ## CORS
 
@@ -113,5 +112,5 @@ restart stopped container(s):
     
 To access db bash directly
 
-    sudo docker exec -it $(sudo docker ps -af "name=db" -q) bash
+    sudo docker exec -it $(sudo docker ps -af "name=db" -q) sh
     
