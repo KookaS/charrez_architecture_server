@@ -104,7 +104,7 @@ restart stopped container(s):
     
 ## Docker compose
 
-    sudo docker-compose down -v
+    sudo docker-compose down
     
     sudo docker-compose up -d
     
