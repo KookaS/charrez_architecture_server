@@ -189,7 +189,7 @@ export const loadImage = () => {
 
 // removes a collection
 export const removeCollection = (dbName: string) => {
-    app.delete("/" + dbName + "/deleteCollection", uploadFile(), async (req, res) => {
+    app.delete("/" + dbName + "/deleteCollection", async (req, res) => {
         try {
             if (!req.headers.authorization) throw new Error('No authorization!');
 
