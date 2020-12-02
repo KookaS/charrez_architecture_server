@@ -10,7 +10,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    volumes: /app/img/uploads
+    volumes: 
+      - /app/img/uploads
     ports:
       - 8080:8080
     networks:
@@ -31,7 +32,8 @@ services:
       - 27017:27017
     networks:
       - server-db
-    volumes: /data/db
+    volumes: 
+      - /data/db
 
 networks:
   server-db:
