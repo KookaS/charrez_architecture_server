@@ -2,22 +2,19 @@ import {MongoHelper} from "@database/helper"
 import {DocumentSchema} from "@schema/mongoSchema";
 
 // connect mongodb to the right port
-export const mongoConnect = () => {
-    MongoHelper.connect().then(() => {
-        console.log(`Connected to Mongo!`)
-    }).catch((err) => {
-        console.error(`Unable to connect to Mongo!`, err)
+export const mongoConnect = async () => {
+    try {
+        await MongoHelper.connect()
+    } catch (err) {
         throw err;
-    });
+    }
 }
 
 // closes the connection to mongodb
 export const mongoClose = () => {
     try {
         MongoHelper.disconnect();
-        console.log(`Closed Mongo!`);
     } catch (err) {
-        console.error(`Unable to close to Mongo!`);
         throw err;
     }
 }

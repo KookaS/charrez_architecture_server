@@ -7,12 +7,10 @@ import {
     removeCollection, removeDocument,
     serverStart
 } from "@server/routes";
-import {mongoConnect} from "@database/mongo";
 
 // has all the possible requests
 export const serverInit = () => {
     try {
-        mongoConnect();
         serverStart();
         loadImage();
         authorization();

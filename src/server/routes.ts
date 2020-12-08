@@ -8,7 +8,7 @@ import {
     mongoInsertProject,
     mongoFetchProject,
     mongoFetchAllCollections,
-    mongoFetchAllDocuments, mongoRemoveCollection, mongoRemoveDocument
+    mongoFetchAllDocuments, mongoRemoveCollection, mongoRemoveDocument, mongoConnect, mongoClose
 } from "@database/mongo";
 import express from "express";
 import HttpStatus from "http-status-codes"
@@ -35,7 +35,9 @@ export const serverStart = () => {
 export const loadAllCollections = (dbName: string) => {
     app.get("/" + dbName + "/loadAllCollections", async (req, res) => {
         try {
+            await mongoConnect();
             const collections = await mongoFetchAllCollections(dbName);
+            mongoClose();
             const resMessage = {message: 'fetch successful', collections};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -57,7 +59,9 @@ export const loadProject = (dbName: string) => {
             const collection = req.query.collection;
             if (!collection) throw new Error('Missing id in query');
 
+            await mongoConnect();
             const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, collection.toString());
+            mongoClose();
             const resMessage = {message: 'fetch successful', collection, documents};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -92,7 +96,9 @@ export const createProject = (dbName: string) => {
                 description: req.body.description,
                 date: req.body.date,
             }
+            await mongoConnect();
             await mongoInsertProject(dbName, id, metadata);
+            mongoClose();
             const resMessage = {message: 'creation successful', collection: id, metadata, warning};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -128,7 +134,9 @@ export const addToProject = (dbName: string) => {
                 description: req.body.description,
                 date: req.body.date,
             }
+            await mongoConnect();
             await mongoInsertProject(dbName, collection.toString(), metadata);
+            mongoClose();
             const resMessage = {message: 'creation successful', collection, metadata, warning};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -151,7 +159,9 @@ export const loadProjectMetadata = (dbName: string) => {
             const id = req.query.id;
             if (!id) throw new Error('Missing id in query');
 
+            await mongoConnect();
             const metadata = await mongoFetchProject(dbName, id.toString());
+            mongoClose();
             const resMessage = {message: 'fetch successful', collection: id, metadata};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -196,9 +206,11 @@ export const removeCollection = (dbName: string) => {
             const collection = req.query.collection;
             if (!collection) throw new Error('Missing collection in query');
 
+            await mongoConnect();
             const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, collection.toString());
             documents.forEach((doc) => removeImage(doc._id));
             await mongoRemoveCollection(dbName, collection.toString());
+            mongoClose();
             const resMessage = {message: 'removal successful', collection};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -227,7 +239,9 @@ export const removeDocument = (dbName: string) => {
             if (!id) throw new Error('Missing id in query');
 
             removeImage(id.toString());
+            await mongoConnect();
             const doc = await mongoRemoveDocument(dbName, collection.toString(), id.toString());
+            mongoClose();
             const resMessage = {message: 'removal successful', collection, id, doc};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -254,8 +268,6 @@ export const authorization = () => {
                 _id = generateID(5);
                 created_at = Date.now();
             } else throw new Error('user or password do not match!');
-
-
             const resMessage = {_id, created_at};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
