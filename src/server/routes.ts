@@ -37,7 +37,6 @@ export const loadAllCollections = (dbName: string) => {
         try {
             await mongoConnect();
             const collections = await mongoFetchAllCollections(dbName);
-            mongoClose();
             const resMessage = {message: 'fetch successful', collections};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -48,6 +47,9 @@ export const loadAllCollections = (dbName: string) => {
                 id: req.query.id
             }
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+        finally {
+            mongoClose();
         }
     });
 }
@@ -61,7 +63,6 @@ export const loadProject = (dbName: string) => {
 
             await mongoConnect();
             const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, collection.toString());
-            mongoClose();
             const resMessage = {message: 'fetch successful', collection, documents};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -72,6 +73,9 @@ export const loadProject = (dbName: string) => {
                 id: req.query.id
             }
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+        finally {
+            mongoClose();
         }
     });
 }
@@ -98,7 +102,6 @@ export const createProject = (dbName: string) => {
             }
             await mongoConnect();
             await mongoInsertProject(dbName, id, metadata);
-            mongoClose();
             const resMessage = {message: 'creation successful', collection: id, metadata, warning};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -110,6 +113,9 @@ export const createProject = (dbName: string) => {
                 id: req.file.filename
             }
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+        finally {
+            mongoClose();
         }
     })
 }
@@ -136,7 +142,6 @@ export const addToProject = (dbName: string) => {
             }
             await mongoConnect();
             await mongoInsertProject(dbName, collection.toString(), metadata);
-            mongoClose();
             const resMessage = {message: 'creation successful', collection, metadata, warning};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -148,6 +153,9 @@ export const addToProject = (dbName: string) => {
                 id: req.file.filename
             }
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+        finally {
+            mongoClose();
         }
     })
 }
@@ -161,7 +169,6 @@ export const loadProjectMetadata = (dbName: string) => {
 
             await mongoConnect();
             const metadata = await mongoFetchProject(dbName, id.toString());
-            mongoClose();
             const resMessage = {message: 'fetch successful', collection: id, metadata};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -172,6 +179,9 @@ export const loadProjectMetadata = (dbName: string) => {
                 id: req.query.id
             }
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+        finally {
+            mongoClose();
         }
     });
 }
@@ -210,7 +220,6 @@ export const removeCollection = (dbName: string) => {
             const documents: DocumentSchema[] = await mongoFetchAllDocuments(dbName, collection.toString());
             documents.forEach((doc) => removeImage(doc._id));
             await mongoRemoveCollection(dbName, collection.toString());
-            mongoClose();
             const resMessage = {message: 'removal successful', collection};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -222,6 +231,9 @@ export const removeCollection = (dbName: string) => {
                 id: req.file.filename
             }
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+        finally {
+            mongoClose();
         }
     })
 }
@@ -241,7 +253,6 @@ export const removeDocument = (dbName: string) => {
             removeImage(id.toString());
             await mongoConnect();
             const doc = await mongoRemoveDocument(dbName, collection.toString(), id.toString());
-            mongoClose();
             const resMessage = {message: 'removal successful', collection, id, doc};
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.OK).send(resMessage);
         } catch (err) {
@@ -253,6 +264,9 @@ export const removeDocument = (dbName: string) => {
                 id: req.file.filename
             }
             res.header({"Access-Control-Allow-Origin": corsOptions.origin}).status(HttpStatus.BAD_REQUEST).send(errorMessage);
+        }
+        finally {
+            mongoClose();
         }
     })
 }
