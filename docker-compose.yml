@@ -28,8 +28,6 @@ services:
     image: mongo:4.0.20-xenial
     container_name: db
     restart: unless-stopped
-    ports:
-      - 27017:27017
     networks:
       - server-db
     volumes: 
